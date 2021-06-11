@@ -19,7 +19,6 @@ var (
 )
 
 type CensorWordDetection struct {
-	SanitizeSpecialChars      bool
 	CensorList                []string
 	CensorReplaceChar         string
 	KeepPrefixChar            bool
@@ -31,7 +30,6 @@ type CensorWordDetection struct {
 // this will create a new CensorWordDetection object
 func NewDetector() *CensorWordDetection {
 	return &CensorWordDetection{
-		SanitizeSpecialChars:      true,
 		CensorList:                censor.CensorWordsList,
 		CensorReplaceChar:         censor.CensorChar,
 		KeepPrefixChar:            false,
@@ -92,7 +90,10 @@ func (censor *CensorWordDetection) CensorWord(word string) (string, error) {
 
 	// sanitize with text normalization
 	word = censor.normalizeText(word)
-	word = censor.SanitizeCharacter(word)
+
+	if censor.SanitizeSpecialCharacters {
+		word = censor.SanitizeCharacter(word)
+	}
 
 	//sort on descending
 	sort.Strings(censor.CensorList)
