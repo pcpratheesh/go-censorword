@@ -1,3 +1,5 @@
+[![Create Release](https://github.com/pcpratheesh/go-censorword/actions/workflows/release.yml/badge.svg)](https://github.com/pcpratheesh/go-censorword/actions/workflows/release.yml)
+
 # go-censorword
 
 go-censorword is a lightweight library for detecting profanities in Go string.
