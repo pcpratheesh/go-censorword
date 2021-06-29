@@ -1,6 +1,7 @@
 package gocensorword_test
 
 import (
+	"fmt"
 	"testing"
 
 	gocensorword "github.com/pcpratheesh/go-censorword"
@@ -76,4 +77,15 @@ func TestBadFullLength(t *testing.T) {
 	word := "fuck post content asshole suck sucker"
 	resultString, _ := detector.CensorWord(word)
 	require.Equal(t, resultString, "f**k post content a*****e s**k s****r")
+}
+
+func TestBadWithCustomReplacePattern(t *testing.T) {
+	var detector = gocensorword.NewDetector().SetCensorReplaceChar("*")
+	detector.KeepPrefixChar = true
+	detector.KeepSuffixChar = true
+	detector.ReplaceCheckPattern = `\b%s\b`
+	word := "pass ass fucker sucker"
+	resultString, _ := detector.CensorWord(word)
+	fmt.Println("resulr----", resultString)
+	require.Equal(t, resultString, "pass a*s f****r s****r")
 }

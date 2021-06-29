@@ -25,6 +25,7 @@ type CensorWordDetection struct {
 	KeepSuffixChar            bool
 	SanitizeSpecialCharacters bool
 	TextNormalization         bool
+	ReplaceCheckPattern       string
 }
 
 // this will create a new CensorWordDetection object
@@ -36,6 +37,7 @@ func NewDetector() *CensorWordDetection {
 		KeepSuffixChar:            false,
 		SanitizeSpecialCharacters: true,
 		TextNormalization:         true,
+		ReplaceCheckPattern:       "(?i)%s",
 	}
 }
 
@@ -109,7 +111,7 @@ func (censor *CensorWordDetection) CensorWord(word string) (string, error) {
 	for _, forbiddenWord := range censor.CensorList {
 
 		// should replace incase sensitive
-		pattern := regexp.MustCompile(fmt.Sprintf(`(?i)%s`, forbiddenWord))
+		pattern := regexp.MustCompile(fmt.Sprintf(censor.ReplaceCheckPattern, forbiddenWord))
 		var replacePattern, prefix, suffix string
 		wordLength := len(forbiddenWord)
 
@@ -126,6 +128,7 @@ func (censor *CensorWordDetection) CensorWord(word string) (string, error) {
 			"%s%s%s", prefix, strings.Repeat(censor.CensorReplaceChar, wordLength), suffix,
 		)
 		word = pattern.ReplaceAllString(word, replacePattern)
+
 	}
 	// join the string
 	return word, nil
