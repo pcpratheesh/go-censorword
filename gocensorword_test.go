@@ -9,7 +9,9 @@ import (
 )
 
 func TestBadWord(t *testing.T) {
-	var detector = gocensorword.NewDetector().SetCensorReplaceChar("*")
+	var detector = gocensorword.NewDetector(
+		gocensorword.WithCensorReplaceChar("*"),
+	)
 
 	word := "bitch"
 	resultString, err := detector.CensorWord(word)
@@ -21,12 +23,15 @@ func TestBadWord(t *testing.T) {
 }
 
 func TestWithCustomList(t *testing.T) {
-	var detector = gocensorword.NewDetector().SetCensorReplaceChar("*")
+	var detector = gocensorword.NewDetector(
+		gocensorword.WithCensorReplaceChar("*"),
+		gocensorword.WithCustomCensorList([]string{
+			"ass", "bitch",
+		}),
+	)
 
 	word := "bad ass"
-	detector.CustomCensorList([]string{
-		"ass", "bitch",
-	})
+
 	resultString, err := detector.CensorWord(word)
 	if err != nil {
 		panic(err)
@@ -36,7 +41,9 @@ func TestWithCustomList(t *testing.T) {
 }
 
 func TestBadWordFirstLetterKept(t *testing.T) {
-	var detector = gocensorword.NewDetector().SetCensorReplaceChar("*")
+	var detector = gocensorword.NewDetector(
+		gocensorword.WithKeepPrefixChar(),
+	)
 
 	word := "bitch"
 	detector.KeepPrefixChar = true
@@ -49,11 +56,13 @@ func TestBadWordFirstLetterKept(t *testing.T) {
 }
 
 func TestBadWordFirstAndLastLetterKept(t *testing.T) {
-	var detector = gocensorword.NewDetector().SetCensorReplaceChar("*")
+	var detector = gocensorword.NewDetector(
+		gocensorword.WithCensorReplaceChar("*"),
+		gocensorword.WithKeepPrefixChar(),
+		gocensorword.WithKeepSuffixChar(),
+	)
 
 	word := "bitch"
-	detector.KeepPrefixChar = true
-	detector.KeepSuffixChar = true
 	resultString, err := detector.CensorWord(word)
 	if err != nil {
 		panic(err)
@@ -63,26 +72,35 @@ func TestBadWordFirstAndLastLetterKept(t *testing.T) {
 }
 
 func TestBadWordEmptyList(t *testing.T) {
-	var detector = gocensorword.NewDetector().SetCensorReplaceChar("*")
-	detector.CustomCensorList([]string{})
+	var detector = gocensorword.NewDetector(
+		gocensorword.WithCustomCensorList(nil),
+	)
+
 	word := "bitch"
 	_, err := detector.CensorWord(word)
 	require.NotNil(t, err)
 }
 
 func TestBadFullLength(t *testing.T) {
-	var detector = gocensorword.NewDetector().SetCensorReplaceChar("*")
-	detector.KeepPrefixChar = true
-	detector.KeepSuffixChar = true
+	var detector = gocensorword.NewDetector(
+		gocensorword.WithCensorReplaceChar("*"),
+		gocensorword.WithKeepPrefixChar(),
+		gocensorword.WithKeepSuffixChar(),
+	)
+
 	word := "fuck post content asshole suck sucker"
 	resultString, _ := detector.CensorWord(word)
 	require.Equal(t, resultString, "f**k post content a*****e s**k s****r")
 }
 
 func TestBadWithCustomReplacePattern(t *testing.T) {
-	var detector = gocensorword.NewDetector().SetCensorReplaceChar("*")
-	detector.KeepPrefixChar = true
-	detector.KeepSuffixChar = true
+	var detector = gocensorword.NewDetector(
+		gocensorword.WithCensorReplaceChar("*"),
+		gocensorword.WithKeepPrefixChar(),
+		gocensorword.WithKeepSuffixChar(),
+		gocensorword.WithReplaceCheckPattern(`\b%s\b`),
+	)
+
 	detector.ReplaceCheckPattern = `\b%s\b`
 	word := "pass ass fucker sucker"
 	resultString, _ := detector.CensorWord(word)
