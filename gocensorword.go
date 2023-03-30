@@ -19,6 +19,7 @@ var (
 	Transformer transform.Transformer
 )
 
+type Options func(*CensorWordDetection)
 type CensorWordDetection struct {
 	CensorList                []string
 	CensorReplaceChar         string
@@ -30,8 +31,8 @@ type CensorWordDetection struct {
 }
 
 // this will create a new CensorWordDetection object
-func NewDetector() *CensorWordDetection {
-	return &CensorWordDetection{
+func NewDetector(options ...Options) *CensorWordDetection {
+	detector := &CensorWordDetection{
 		CensorList:                censor.CensorWordsList,
 		CensorReplaceChar:         censor.CensorChar,
 		KeepPrefixChar:            false,
@@ -40,31 +41,64 @@ func NewDetector() *CensorWordDetection {
 		TextNormalization:         true,
 		ReplaceCheckPattern:       "(?i)%s",
 	}
+
+	// add / update new options
+	for _, opt := range options {
+		opt(detector)
+	}
+
+	return detector
 }
 
+// WithCustomCensorList
 // change the default censor list
 // can provide own censor words list
-func (censor *CensorWordDetection) CustomCensorList(list []string) *CensorWordDetection {
-	censor.CensorList = list
-	return censor
+func WithCustomCensorList(list []string) Options {
+	return func(detector *CensorWordDetection) {
+		detector.CensorList = list
+	}
 }
 
-// change the censorReplaceCharacter
-func (censor *CensorWordDetection) SetCensorReplaceChar(char string) *CensorWordDetection {
-	censor.CensorReplaceChar = char
-	return censor
+// WithCensorReplaceChar
+func WithCensorReplaceChar(char string) Options {
+	return func(detector *CensorWordDetection) {
+		detector.CensorReplaceChar = char
+	}
 }
 
-// sanitize special characters
-func (censor *CensorWordDetection) WithSanitizeSpecialCharacters(status bool) *CensorWordDetection {
-	censor.SanitizeSpecialCharacters = status
-	return censor
+// WithSanitizeSpecialCharacters
+func WithSanitizeSpecialCharacters(status bool) Options {
+	return func(detector *CensorWordDetection) {
+		detector.SanitizeSpecialCharacters = status
+	}
 }
 
-// sanitize text normalization
-func (censor *CensorWordDetection) WithTextNormalization(status bool) *CensorWordDetection {
-	censor.TextNormalization = status
-	return censor
+// WithTextNormalization
+func WithTextNormalization(status bool) Options {
+	return func(detector *CensorWordDetection) {
+		detector.TextNormalization = status
+	}
+}
+
+// WithKeepPrefixChar
+func WithKeepPrefixChar() Options {
+	return func(detector *CensorWordDetection) {
+		detector.KeepPrefixChar = true
+	}
+}
+
+// WithKeepPrefixChar
+func WithKeepSuffixChar() Options {
+	return func(detector *CensorWordDetection) {
+		detector.KeepSuffixChar = true
+	}
+}
+
+// WithReplaceCheckPattern
+func WithReplaceCheckPattern(pattern string) Options {
+	return func(detector *CensorWordDetection) {
+		detector.ReplaceCheckPattern = pattern
+	}
 }
 
 // sanitize text normalization
