@@ -57,7 +57,6 @@ if err != nil {
 - *WithKeepPrefixChar(bool)*: If you want to Kept the prefix Character (eg : F****)
 - *WithKeepSuffixChar(bool)*: If you want to Kept the suffix Character (eg : ****K)
 
-## Example
 ```go
 detector := NewDetector(
     gocensorword.WithCensorReplaceChar("*"),
